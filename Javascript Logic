@@ -1,0 +1,58 @@
+const url =
+  "https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/kickstarter-funding-data.json";
+
+const width = 960;
+const height = 600;
+
+const svg = d3.select("#chart").attr("width", width).attr("height", height);
+
+const tooltip = d3.select("#tooltip");
+
+d3.json(url).then((data) => {
+  const root = d3
+    .hierarchy(data, (d) => d.children)
+    .sum((d) => d.value)
+    .sort((a, b) => b.value - a.value);
+
+  d3.treemap().size([width, height]).padding(1)(root);
+
+  svg
+    .selectAll("g")
+    .data(root.leaves())
+    .enter()
+    .append("g")
+    .attr("transform", (d) => `translate(${d.x0}, ${d.y0})`)
+    .append("rect")
+    .attr("class", "tile")
+    .attr("id", (d) => d.data.name.replace(/\s+/g, "")) // Unique ids
+    .attr("width", (d) => d.x1 - d.x0)
+    .attr("height", (d) => d.y1 - d.y0)
+    .attr("data-name", (d) => d.data.name)
+    .attr("data-category", (d) => d.data.category)
+    .attr("data-value", (d) => d.data.value)
+    .style("fill", (d) => d3.schemeCategory10[d.data.category])
+    .on("mousemove", (event, d) => {
+      tooltip
+        .style("opacity", 1)
+        .attr("data-value", d.data.value)
+        .style("left", `${event.pageX + 5}px`)
+        .style("top", `${event.pageY - 28}px`)
+        .html(
+          `${d.data.name} <br> ${
+            d.data.category
+          } <br> $${d.data.value.toLocaleString()}`
+        );
+    })
+    .on("mouseout", () => tooltip.style("opacity", 0));
+
+  // Add a legend
+  const categories = [...new Set(data.children.map((item) => item.name))];
+  const legend = d3.select("#legend");
+  categories.forEach((category, i) => {
+    legend
+      .append("div")
+      .attr("class", "legend-item")
+      .style("background-color", d3.schemeCategory10[i])
+      .text(category);
+  });
+});
