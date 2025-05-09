@@ -1,4 +1,6 @@
-# Treemap Diagram Visualization README
+````markdown
+
+# Treemap Diagram Visualization
 
 Welcome to the Treemap Diagram Visualization project! This project allows you to create an interactive treemap diagram that visualizes data based on different datasets, such as Kickstarter pledges, movie sales, or video game sales. This README will walk you through the necessary components, user stories, and how to run the project.
 
